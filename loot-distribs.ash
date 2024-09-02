@@ -164,7 +164,9 @@ Search the clan's raid logs and tally their loot distributions.
 */
 void add_distributions(int[string][string][string] totals, string clan)
 {
-    join_clan(clan);
+    if (! join_clan(clan)) {
+		abort(`Could not join clan {clan} not found.  ABORTED.`);
+	}
     print(`Loading raidlogs from {clan}...`);
     dungeon_run[int] raidlogs = load_raidlogs();
     foreach n, drun in raidlogs {
@@ -211,6 +213,15 @@ void main(string args)
     if (acp.parameters.count() == 0) {
         add_distributions(totals, saved_clan);
     } else {
+		// First, see if all clans are correctly named
+		print("Checking clan names...", "blue");
+		foreach i, cln in acp.parameters {
+			if (! join_clan(cln)) {
+				abort(`Could not join clan {cln}.  ABORTED.`);
+			}
+		}
+		// Now, visit the clans and tally the loot distributions
+		print("Searching clan records...", "blue");
         foreach i, cln in acp.parameters {
             add_distributions(totals, cln);
         }
